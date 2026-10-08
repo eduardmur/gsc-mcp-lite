@@ -1,7 +1,7 @@
 {
   "name": "@eduardmur/gsc-mcp-lite",
   "version": "0.1.0",
-  "description": "Google Search Console over MCP, the small way: list properties, run Search Analytics queries, inspect URLs and list sitemaps. Read-only, one credentials file, no analysis layer.",
+  "description": "The Google Search Console Performance report over MCP: clicks, impressions, CTR and position by query, page, country, device and date. Read-only, one credentials file, no analysis layer.",
   "keywords": [
     "mcp",
     "model-context-protocol",

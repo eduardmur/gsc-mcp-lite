@@ -18,8 +18,6 @@ const api: GscApi = {
     ],
     responseAggregationType: "byPage",
   })),
-  inspectUrl: vi.fn(async () => ({ inspectionResult: { indexStatusResult: { verdict: "PASS" } } })),
-  listSitemaps: vi.fn(async () => [{ path: "https://x.com/sitemap.xml", isPending: false }]),
 };
 
 let client: Client;
@@ -49,14 +47,9 @@ beforeAll(async () => {
 });
 
 describe("tools", () => {
-  it("registers four read-only tools and short instructions", async () => {
+  it("registers two read-only tools and short instructions", async () => {
     const { tools } = await client.listTools();
-    expect(tools.map((t) => t.name).sort()).toEqual([
-      "inspect-url",
-      "list-properties",
-      "list-sitemaps",
-      "search-analytics",
-    ]);
+    expect(tools.map((t) => t.name).sort()).toEqual(["list-properties", "search-analytics"]);
     for (const tool of tools) {
       expect(tool.annotations?.readOnlyHint).toBe(true);
       expect(tool.description?.length ?? 0).toBeLessThan(600);
@@ -148,28 +141,10 @@ describe("tools", () => {
   });
 
   it("turns API errors into isError results with the message", async () => {
-    vi.mocked(api.listSitemaps).mockRejectedValueOnce(new GscError("Not found (404): nope", 404));
-    const { isError, text } = await call("list-sitemaps", { site_url: "sc-domain:nope" });
+    vi.mocked(api.query).mockRejectedValueOnce(new GscError("Not found (404): nope", 404));
+    const { isError, text } = await call("search-analytics", { site_url: "sc-domain:nope" });
     expect(isError).toBe(true);
     expect(text).toBe("Not found (404): nope");
-  });
-
-  it("inspect-url and list-sitemaps return Google's payloads", async () => {
-    const inspect = await call("inspect-url", {
-      site_url: "sc-domain:x.com",
-      url: "https://x.com/a",
-    });
-    expect(inspect.body).toEqual({ inspectionResult: { indexStatusResult: { verdict: "PASS" } } });
-    expect(api.inspectUrl).toHaveBeenLastCalledWith(
-      "sc-domain:x.com",
-      "https://x.com/a",
-      undefined,
-    );
-    const sitemaps = await call("list-sitemaps", { site_url: "sc-domain:x.com" });
-    expect(sitemaps.body).toEqual({
-      site_url: "sc-domain:x.com",
-      sitemaps: [{ path: "https://x.com/sitemap.xml", isPending: false }],
-    });
   });
 });
 

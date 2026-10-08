@@ -14,7 +14,7 @@ function fakeAuth(
         : null;
   return {
     source: () => "fake",
-    credentials: () => creds as Auth extends { credentials: () => infer R } ? R : never,
+    credentials: () => creds as ReturnType<Auth["credentials"]>,
     getClient: async () => ({ request }) as never,
     login: async () => null,
     reset: vi.fn<() => void>(),
@@ -29,21 +29,22 @@ describe("createGscApi", () => {
           data: { siteEntry: [{ siteUrl: "sc-domain:x.com", permissionLevel: "siteOwner" }] },
         };
       }
-      if (options.url.includes("searchAnalytics")) {
-        return {
-          data: { rows: [{ keys: ["a"], clicks: 1, impressions: 2, ctr: 0.5, position: 3 }] },
-        };
-      }
-      if (options.url.includes("urlInspection")) {
-        return { data: { inspectionResult: { indexStatusResult: { verdict: "PASS" } } } };
-      }
-      return { data: { sitemap: [{ path: "https://x.com/sitemap.xml" }] } };
+      return {
+        data: { rows: [{ keys: ["a"], clicks: 1, impressions: 2, ctr: 0.5, position: 3 }] },
+      };
     });
     const api = createGscApi(fakeAuth(request));
 
     expect(await api.listSites()).toEqual([
       { siteUrl: "sc-domain:x.com", permissionLevel: "siteOwner" },
     ]);
+    expect(request).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        method: "GET",
+        url: "https://searchconsole.googleapis.com/webmasters/v3/sites",
+      }),
+    );
+
     const body = { startDate: "2026-01-01", endDate: "2026-01-28", dimensions: ["query"] };
     expect((await api.query("https://x.com/", body)).rows).toHaveLength(1);
     expect(request).toHaveBeenLastCalledWith(
@@ -53,27 +54,22 @@ describe("createGscApi", () => {
         data: body,
       }),
     );
-    await api.inspectUrl("sc-domain:x.com", "https://x.com/p", "de");
+    await api.query("sc-domain:x.com", body);
     expect(request).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        url: "https://searchconsole.googleapis.com/v1/urlInspection/index:inspect",
-        data: { siteUrl: "sc-domain:x.com", inspectionUrl: "https://x.com/p", languageCode: "de" },
-      }),
-    );
-    expect(await api.listSitemaps("sc-domain:x.com")).toEqual([
-      { path: "https://x.com/sitemap.xml" },
-    ]);
-    expect(request).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        url: "https://searchconsole.googleapis.com/webmasters/v3/sites/sc-domain%3Ax.com/sitemaps",
+        url: "https://searchconsole.googleapis.com/webmasters/v3/sites/sc-domain%3Ax.com/searchAnalytics/query",
       }),
     );
   });
 
-  it("returns empty lists when Google omits the array", async () => {
+  it("returns empty results when Google omits the arrays", async () => {
     const api = createGscApi(fakeAuth(async () => ({ data: {} })));
     expect(await api.listSites()).toEqual([]);
-    expect(await api.listSitemaps("sc-domain:x.com")).toEqual([]);
+    const empty = await api.query("sc-domain:x.com", {
+      startDate: "2026-01-01",
+      endDate: "2026-01-02",
+    });
+    expect(empty).toEqual({});
   });
 
   it("wraps API errors and resets auth only on credential failures", async () => {

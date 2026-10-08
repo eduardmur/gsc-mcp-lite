@@ -1,13 +1,11 @@
 # gsc-mcp-lite
 
-Google Search Console data in Claude, Cursor or any other MCP client. Four read-only tools:
+The Google Search Console Performance report in Claude, Cursor or any other MCP client: clicks, impressions, CTR and position by query, page, country, device, date or search appearance, for any date range and filter. Two read-only tools:
 
 | Tool | Returns |
 | --- | --- |
 | `list-properties` | The properties your credentials can see, with permission levels. |
-| `search-analytics` | Any Search Analytics query: clicks, impressions, CTR and position by query, page, country, device, date, search appearance or hour, with filters, search type and paging. |
-| `inspect-url` | Google's index status for one URL: verdict, coverage, last crawl, canonical, rich results. |
-| `list-sitemaps` | Submitted sitemaps with their status, errors and counts. |
+| `search-analytics` | The Performance report: clicks, impressions, CTR and position grouped by query, page, country, device, date, search appearance or hour, with filters, search type and paging. |
 
 There is no analysis layer, no prompts, no cache and no settings. You ask the question, the model builds the query, Google answers. This package is for people who want the raw data and nothing in between.
 
@@ -106,7 +104,7 @@ This prints the properties the credentials can see, or the exact problem. Then a
 - "List my Search Console properties."
 - "Top 20 queries for example.com in the last 28 days."
 - "Clicks by day for pages under /blog/ in September 2026."
-- "Is https://example.com/pricing indexed, and which canonical did Google pick?"
+- "Which countries and devices bring the most impressions, and where is the CTR lowest?"
 
 ## What the API gives you
 
@@ -118,7 +116,6 @@ These are limits of Search Console itself. The tool descriptions repeat them to 
 - One call returns at most 25,000 rows. The response carries `next_start_row` when there are more.
 - Country values are three-letter ISO codes in lowercase, such as `usa` or `deu`.
 - Hourly data needs `data_state=hourly_all` and a range of at most 10 days.
-- `inspect-url` is limited by Google to 2,000 URLs per property per day.
 - Nothing older than about 16 months is available.
 
 ## Troubleshooting

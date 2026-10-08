@@ -6,7 +6,7 @@ import type { ApiRow, GscApi } from "./gsc.js";
 import { NAME, VERSION } from "./version.js";
 
 export const INSTRUCTIONS =
-  "Read-only access to Google Search Console. Call list-properties first and pass site_url exactly as it is returned (https://example.com/ or sc-domain:example.com). Dates are YYYY-MM-DD in Pacific Time. Google finalizes data after 2-3 days; data_state=final (the default) leaves unfinished days out.";
+  "Read-only access to the Google Search Console Performance report. Call list-properties first and pass site_url exactly as it is returned (https://example.com/ or sc-domain:example.com). Dates are YYYY-MM-DD in Pacific Time. Google finalizes data after 2-3 days; data_state=final (the default) leaves unfinished days out.";
 
 export const DIMENSIONS = [
   "query",
@@ -94,7 +94,7 @@ export function createServer(api: GscApi, options: ServerOptions = {}): McpServe
     {
       title: "Search analytics",
       description:
-        "Run a Search Analytics query for one property and get clicks, impressions, CTR and average position, grouped by the dimensions you choose (none = one row of totals for the period). Defaults: the last 28 finalized days, type web, 1000 rows; Google returns at most 25,000 rows per call, so page with start_row. Rows list only the queries and pages Google chooses to name; totals from a call without dimensions are the complete numbers.",
+        "The Performance report for one property: clicks, impressions, CTR and average position, grouped by the dimensions you choose (query, page, country, device, date, searchAppearance, hour; none = one row of totals for the period). Defaults: the last 28 finalized days, type web, 1000 rows; Google returns at most 25,000 rows per call, so page with start_row. Rows list only the queries and pages Google chooses to name; totals from a call without dimensions are the complete numbers.",
       inputSchema: {
         site_url: SITE_URL,
         start_date: DATE.optional().describe(
@@ -186,41 +186,6 @@ export function createServer(api: GscApi, options: ServerOptions = {}): McpServe
           rows,
         };
       }),
-  );
-
-  server.registerTool(
-    "inspect-url",
-    {
-      title: "Inspect URL",
-      description:
-        "Google's index status for one URL (the URL Inspection API): verdict, coverage state, last crawl, Google-selected canonical, referring sitemaps, mobile usability and rich results. Quota: 2,000 inspections per property per day.",
-      inputSchema: {
-        site_url: SITE_URL,
-        url: z.string().describe("The full URL to inspect. It must belong to the property."),
-        language_code: z
-          .string()
-          .optional()
-          .describe("BCP-47 code for the result messages, e.g. en-US (default) or de."),
-      },
-      annotations: READ_ONLY,
-    },
-    (args) => run(() => api.inspectUrl(args.site_url, args.url, args.language_code)),
-  );
-
-  server.registerTool(
-    "list-sitemaps",
-    {
-      title: "List sitemaps",
-      description:
-        "The sitemaps submitted for a property: path, last submitted and downloaded times, pending state, errors, warnings and the submitted and indexed counts per content type.",
-      inputSchema: { site_url: SITE_URL },
-      annotations: READ_ONLY,
-    },
-    (args) =>
-      run(async () => ({
-        site_url: args.site_url,
-        sitemaps: await api.listSitemaps(args.site_url),
-      })),
   );
 
   return server;

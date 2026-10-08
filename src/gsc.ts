@@ -3,7 +3,6 @@ import { PACKAGE } from "./version.js";
 
 const HOST = "https://searchconsole.googleapis.com";
 const V3 = `${HOST}/webmasters/v3`;
-const INSPECT = `${HOST}/v1/urlInspection/index:inspect`;
 const REQUEST_TIMEOUT_MS = 60_000;
 
 export interface SiteEntry {
@@ -44,11 +43,6 @@ export interface SearchAnalyticsResponse {
   metadata?: Record<string, unknown>;
 }
 
-export interface SitemapEntry {
-  path: string;
-  [key: string]: unknown;
-}
-
 export class GscError extends Error {
   constructor(
     message: string,
@@ -62,15 +56,9 @@ export class GscError extends Error {
 export interface GscApi {
   listSites(): Promise<SiteEntry[]>;
   query(siteUrl: string, body: SearchAnalyticsRequest): Promise<SearchAnalyticsResponse>;
-  inspectUrl(
-    siteUrl: string,
-    inspectionUrl: string,
-    languageCode?: string,
-  ): Promise<Record<string, unknown>>;
-  listSitemaps(siteUrl: string): Promise<SitemapEntry[]>;
 }
 
-/** Four calls, one attempt each. Property identifiers are path segments and must be fully encoded. */
+/** Two calls, one attempt each. Property identifiers are path segments and must be fully encoded. */
 export function createGscApi(auth: Auth): GscApi {
   async function call<T>(method: "GET" | "POST", url: string, data?: unknown): Promise<T> {
     const client = await auth.getClient();
@@ -94,15 +82,6 @@ export function createGscApi(auth: Auth): GscApi {
     async query(siteUrl, body) {
       const url = `${V3}/sites/${encodeURIComponent(siteUrl)}/searchAnalytics/query`;
       return (await call<SearchAnalyticsResponse>("POST", url, body)) ?? {};
-    },
-    async inspectUrl(siteUrl, inspectionUrl, languageCode) {
-      const body = { siteUrl, inspectionUrl, languageCode };
-      return (await call<Record<string, unknown>>("POST", INSPECT, body)) ?? {};
-    },
-    async listSitemaps(siteUrl) {
-      const url = `${V3}/sites/${encodeURIComponent(siteUrl)}/sitemaps`;
-      const data = await call<{ sitemap?: SitemapEntry[] }>("GET", url);
-      return data?.sitemap ?? [];
     },
   };
 }

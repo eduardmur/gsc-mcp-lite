@@ -15,7 +15,7 @@ describe("built binary", () => {
     expect(help.stdout).toContain("GSC_CREDENTIALS");
   });
 
-  it("serves the four tools over stdio and reports credential problems per call", async () => {
+  it("serves the two tools over stdio and reports credential problems per call", async () => {
     const transport = new StdioClientTransport({
       command: process.execPath,
       args: [BIN],
@@ -26,7 +26,7 @@ describe("built binary", () => {
     await client.connect(transport);
     try {
       const { tools } = await client.listTools();
-      expect(tools).toHaveLength(4);
+      expect(tools).toHaveLength(2);
       const result = await client.callTool({ name: "list-properties", arguments: {} });
       expect(result.isError).toBe(true);
       expect((result.content as Array<{ text: string }>)[0]?.text).toContain(
