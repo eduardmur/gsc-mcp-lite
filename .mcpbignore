@@ -1,0 +1,13 @@
+src/
+test/
+scripts/
+.github/
+biome.json
+tsconfig.json
+tsconfig.build.json
+vitest.config.ts
+package-lock.json
+CONTRIBUTING.md
+.gitignore
+.mcpbignore
+*.mcpb

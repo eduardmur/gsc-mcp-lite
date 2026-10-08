@@ -1,0 +1,63 @@
+{
+  "manifest_version": "0.2",
+  "name": "gsc-mcp-lite",
+  "display_name": "Google Search Console (lite)",
+  "version": "0.1.0",
+  "description": "Read-only Google Search Console data: properties, Search Analytics queries, URL inspection and sitemaps.",
+  "long_description": "Four read-only tools over the Search Console API, nothing else: list-properties, search-analytics (clicks, impressions, CTR and position by query, page, country, device, date, search appearance or hour, with filters and paging), inspect-url and list-sitemaps. Bring a credentials file from your own Google Cloud project: a service-account key or a Desktop-app OAuth client. The README explains how to get one.",
+  "author": {
+    "name": "Eduard Mur",
+    "url": "https://github.com/eduardmur"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eduardmur/gsc-mcp-lite"
+  },
+  "homepage": "https://github.com/eduardmur/gsc-mcp-lite",
+  "license": "MIT",
+  "keywords": ["google-search-console", "seo", "search-console", "gsc"],
+  "server": {
+    "type": "node",
+    "entry_point": "dist/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/dist/index.js"],
+      "env": {
+        "GSC_CREDENTIALS": "${user_config.credentials}"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "list-properties",
+      "description": "The Search Console properties the credentials can see, with permission levels."
+    },
+    {
+      "name": "search-analytics",
+      "description": "Clicks, impressions, CTR and position for any dimensions, filters, search type and date range."
+    },
+    {
+      "name": "inspect-url",
+      "description": "Google's index status for one URL."
+    },
+    {
+      "name": "list-sitemaps",
+      "description": "Submitted sitemaps with their status, errors and counts."
+    }
+  ],
+  "user_config": {
+    "credentials": {
+      "type": "file",
+      "title": "Google credentials file",
+      "description": "The JSON file from Google Cloud: a service-account key or a Desktop-app OAuth client. See the README for the steps.",
+      "required": true
+    }
+  },
+  "compatibility": {
+    "claude_desktop": ">=0.10.0",
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "node": ">=20.0.0"
+    }
+  }
+}

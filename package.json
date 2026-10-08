@@ -1,0 +1,59 @@
+{
+  "name": "@eduardmur/gsc-mcp-lite",
+  "version": "0.1.0",
+  "description": "Google Search Console over MCP, the small way: list properties, run Search Analytics queries, inspect URLs and list sitemaps. Read-only, one credentials file, no analysis layer.",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "google-search-console",
+    "search-console",
+    "gsc",
+    "seo",
+    "claude",
+    "mcp-server"
+  ],
+  "license": "MIT",
+  "author": "Eduard Mur",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eduardmur/gsc-mcp-lite.git"
+  },
+  "homepage": "https://github.com/eduardmur/gsc-mcp-lite#readme",
+  "bugs": "https://github.com/eduardmur/gsc-mcp-lite/issues",
+  "type": "module",
+  "bin": {
+    "gsc-mcp-lite": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "pretest": "npm run build",
+    "test": "vitest run",
+    "pack:mcpb": "node scripts/pack-mcpb.mjs",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "google-auth-library": "^11.2.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.2.0",
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2",
+    "vitest": "^5.0.0"
+  }
+}
