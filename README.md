@@ -9,7 +9,7 @@ Google Search Console data in Claude, Cursor or any other MCP client. Four read-
 | `inspect-url` | Google's index status for one URL: verdict, coverage, last crawl, canonical, rich results. |
 | `list-sitemaps` | Submitted sitemaps with their status, errors and counts. |
 
-There is no analysis layer, no prompts, no cache and no settings. You ask the question, the model builds the query, Google answers. The full [gsc-mcp](https://github.com/eduardmur/gsc-mcp) adds SEO analysis on top: why traffic moved, what to fix first. This package is for people who want the raw data and nothing in between.
+There is no analysis layer, no prompts, no cache and no settings. You ask the question, the model builds the query, Google answers. This package is for people who want the raw data and nothing in between.
 
 It runs on your machine, talks only to `googleapis.com`, asks Google for the read-only Search Console scope, and never changes anything in your account.
 
