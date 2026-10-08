@@ -13,7 +13,7 @@ It runs on your machine, talks only to `googleapis.com`, asks Google for the rea
 
 ## Setup
 
-You need [Node.js](https://nodejs.org) 20 or newer (the LTS installer, on macOS or Windows) and one credentials file from Google Cloud. The Claude Desktop bundle described below works without Node.js.
+You need [Node.js](https://nodejs.org) 20 or newer and one credentials file from Google Cloud. The Claude Desktop bundle described below works without Node.js.
 
 ### 1. Get a credentials file
 
@@ -43,15 +43,7 @@ If your organization blocks service-account keys, use an OAuth client instead.
 
 ### 2. Point your MCP client at the file
 
-The server takes one setting: `GSC_CREDENTIALS`, the path to that JSON file. Keep the file somewhere permanent rather than in Downloads.
-
-#### Claude Desktop, one click
-
-Download `gsc-mcp-lite.mcpb` from the [releases page](https://github.com/eduardmur/gsc-mcp-lite/releases) and open it. Claude Desktop asks for the credentials file in a dialog, and nothing else needs installing.
-
-#### Claude Desktop, macOS
-
-Settings, Developer, Edit Config opens `~/Library/Application Support/Claude/claude_desktop_config.json`:
+The server takes one setting, `GSC_CREDENTIALS`: the path to that JSON file. Keep the file somewhere permanent rather than in Downloads. Every MCP client takes the same server definition:
 
 ```json
 {
@@ -59,39 +51,27 @@ Settings, Developer, Edit Config opens `~/Library/Application Support/Claude/cla
     "gsc": {
       "command": "npx",
       "args": ["-y", "@eduardmur/gsc-mcp-lite"],
-      "env": { "GSC_CREDENTIALS": "/Users/you/gsc/key.json" }
+      "env": { "GSC_CREDENTIALS": "/path/to/key.json" }
     }
   }
 }
 ```
 
-#### Claude Desktop, Windows
+Paste it into the client's MCP settings: Claude Desktop (Settings, Developer, Edit Config), Cursor, Windsurf, VS Code or any other client that runs MCP servers over stdio. Claude Desktop can also install it in one click: download `gsc-mcp-lite.mcpb` from the [releases page](https://github.com/eduardmur/gsc-mcp-lite/releases), open it, and pick the credentials file in the dialog.
 
-The file is `%APPDATA%\Claude\claude_desktop_config.json`. Backslashes in the path are doubled, and `npx` runs through `cmd`:
-
-```json
-{
-  "mcpServers": {
-    "gsc": {
-      "command": "cmd",
-      "args": ["/c", "npx", "-y", "@eduardmur/gsc-mcp-lite"],
-      "env": { "GSC_CREDENTIALS": "C:\\Users\\you\\gsc\\key.json" }
-    }
-  }
-}
-```
-
-Restart Claude Desktop after saving. The tools appear under the tools icon in the chat box.
-
-#### Claude Code
+Clients with a command line:
 
 ```bash
+# Claude Code
 claude mcp add gsc -e GSC_CREDENTIALS=/path/to/key.json -- npx -y @eduardmur/gsc-mcp-lite
+
+# Codex
+codex mcp add gsc --env GSC_CREDENTIALS=/path/to/key.json -- npx -y @eduardmur/gsc-mcp-lite
 ```
 
-#### Cursor, Windsurf, VS Code, others
+On Windows, write the path with doubled backslashes (`C:\\Users\\you\\gsc\\key.json`). If the client cannot start `npx` directly, use `"command": "cmd"` with `"args": ["/c", "npx", "-y", "@eduardmur/gsc-mcp-lite"]`.
 
-Paste the macOS or Windows JSON above into the client's MCP settings.
+Restart the client after saving. The tools appear in the client's tool list.
 
 ### 3. Check
 
@@ -120,8 +100,8 @@ These are limits of Search Console itself. The tool descriptions repeat them to 
 
 ## Troubleshooting
 
-- "Cannot read the credentials file": the path in `GSC_CREDENTIALS` is wrong. On Windows, double every backslash in the JSON config.
-- `npx` is not recognized (Windows): install Node.js LTS, then quit and reopen Claude Desktop so it sees the new PATH. Keep the `cmd /c` form shown above, or use the `.mcpb` bundle, which needs no Node.js.
+- "Cannot read the credentials file": the path in `GSC_CREDENTIALS` is wrong. On Windows, double every backslash.
+- `npx` is not recognized (Windows): install Node.js LTS, then quit and reopen the client so it sees the new PATH. Use the `cmd` form from step 2, or the `.mcpb` bundle for Claude Desktop, which needs no Node.js.
 - Empty property list or a 403 with a service account: the service account has not been added to the property in Search Console (step 5), or the Search Console API is not enabled in the project (step 2).
 - Sign-in expires every week (OAuth): the app is still in Testing. Publish it (OAuth step 3) and sign in again.
 - Sign out: delete the token file in `~/Library/Application Support/gsc-mcp-lite` (macOS), `%APPDATA%\gsc-mcp-lite` (Windows) or `~/.config/gsc-mcp-lite` (Linux). To revoke the grant itself, use https://myaccount.google.com/permissions.
