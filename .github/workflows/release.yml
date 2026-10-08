@@ -1,0 +1,45 @@
+name: Release
+
+# Pushing a tag like v0.1.0 publishes that version to npm (trusted publishing,
+# no token in the repo) and creates a GitHub release with the Claude Desktop
+# bundle attached. The tag must match the version in package.json and manifest.json.
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # create the GitHub release and attach the .mcpb
+      id-token: write # npm trusted publishing (OIDC) and provenance
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      # Trusted publishing needs npm 11.5.1 or newer; Node 22 bundles npm 10.
+      - run: npm install -g npm@latest
+      - name: Check that the tag matches package.json and manifest.json
+        run: |
+          node -e '
+            const fs = require("node:fs");
+            const tag = process.env.GITHUB_REF_NAME;
+            const pkg = JSON.parse(fs.readFileSync("package.json", "utf8")).version;
+            const manifest = JSON.parse(fs.readFileSync("manifest.json", "utf8")).version;
+            if (tag !== `v${pkg}` || tag !== `v${manifest}`) {
+              console.error(`tag ${tag} but package.json ${pkg} and manifest.json ${manifest}`);
+              process.exit(1);
+            }
+          '
+      - run: npm ci
+      - run: npm test
+      - run: npm publish --provenance --access public
+      - run: npm run pack:mcpb
+      - name: Create the GitHub release with the bundle
+        run: gh release create "$GITHUB_REF_NAME" gsc-mcp-lite.mcpb --title "$GITHUB_REF_NAME" --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}

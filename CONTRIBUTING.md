@@ -11,11 +11,7 @@ The code is four files in `src/`: `auth.ts` (which credentials file this is, sig
 
 ## Releasing
 
-```bash
-npm version patch       # or minor
-npm publish
-git push --follow-tags
-npm run pack:mcpb       # builds gsc-mcp-lite.mcpb; attach it to the GitHub release
-```
+1. Set the same new version in `package.json` and `manifest.json`, commit, and tag it: `git tag v0.1.1`.
+2. `git push && git push --tags`.
 
-Bump `version` in `manifest.json` together with `package.json`.
+The Release workflow runs the tests, publishes to npm through trusted publishing (no token lives in the repo), builds `gsc-mcp-lite.mcpb` and attaches it to a GitHub release for the tag. `npm run pack:mcpb` builds the bundle locally if you need it without a release.
