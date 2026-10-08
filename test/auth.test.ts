@@ -1,6 +1,6 @@
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { createAuth, detectCredentials, tokenPath } from "../src/auth.js";
 import { configDir } from "../src/paths.js";
@@ -59,17 +59,21 @@ describe("detectCredentials", () => {
 describe("configDir", () => {
   it("follows each platform's convention and the override", () => {
     const home = "/home/u";
-    expect(configDir({}, "darwin", home)).toBe("/home/u/Library/Application Support/gsc-mcp-lite");
+    expect(configDir({}, "darwin", home)).toBe(
+      join(home, "Library", "Application Support", "gsc-mcp-lite"),
+    );
     expect(configDir({ APPDATA: "C:\\Users\\u\\AppData\\Roaming" }, "win32", home)).toMatch(
       /AppData[\\/]Roaming[\\/]gsc-mcp-lite$/,
     );
-    expect(configDir({}, "linux", home)).toBe("/home/u/.config/gsc-mcp-lite");
-    expect(configDir({ XDG_CONFIG_HOME: "/x" }, "linux", home)).toBe("/x/gsc-mcp-lite");
+    expect(configDir({}, "linux", home)).toBe(join(home, ".config", "gsc-mcp-lite"));
+    expect(configDir({ XDG_CONFIG_HOME: "/x" }, "linux", home)).toBe(join("/x", "gsc-mcp-lite"));
     expect(configDir({ GSC_MCP_LITE_DIR: "/o" }, "darwin", home)).toBe("/o");
   });
 
   it("names token files by a hash of the client id", () => {
-    expect(tokenPath("a", "/d")).toMatch(/^\/d\/token-[0-9a-f]{16}\.json$/);
+    const path = tokenPath("a", "/d");
+    expect(dirname(path)).toBe(join("/d"));
+    expect(basename(path)).toMatch(/^token-[0-9a-f]{16}\.json$/);
     expect(tokenPath("a", "/d")).not.toBe(tokenPath("b", "/d"));
   });
 });
