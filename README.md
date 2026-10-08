@@ -1,5 +1,7 @@
 # gsc-mcp-lite
 
+> There is also a hosted version. [Searcherries](https://searcherries.com), by the same author, runs an MCP server with one-click sign-in that covers Google Search Console, Bing Webmaster Tools, GA4 AI traffic and tracked AI answers in one place. The two are independent: nothing in this package needs it.
+
 The Google Search Console Performance report in Claude, Cursor or any other MCP client: clicks, impressions, CTR and position by query, page, country, device, date or search appearance, for any date range and filter. Two read-only tools:
 
 | Tool | Returns |
