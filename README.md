@@ -1,7 +1,5 @@
 # gsc-mcp-lite
 
-> There is also a hosted version. [Searcherries](https://searcherries.com), by the same author, runs an MCP server with one-click sign-in that covers Google Search Console, Bing Webmaster Tools, GA4 AI traffic and tracked AI answers in one place. The two are independent: nothing in this package needs it.
-
 The Google Search Console Performance report in Claude, Cursor or any other MCP client: clicks, impressions, CTR and position by query, page, country, device, date or search appearance, for any date range and filter. Two read-only tools:
 
 | Tool | Returns |
@@ -16,6 +14,8 @@ It runs on your machine, talks only to `googleapis.com`, asks Google for the rea
 ## Setup
 
 You need [Node.js](https://nodejs.org) 20 or newer and one credentials file from Google Cloud. The Claude Desktop bundle described below works without Node.js.
+
+If you would rather skip the Google Cloud part, [Searcherries](https://searcherries.com), by the same author, runs a hosted MCP server: you sign in with Google once in the browser, and it covers Google Search Console, Bing Webmaster Tools, GA4 AI traffic and tracked AI answers from one server. It is a separate product; this package does not need it. The steps below are for running the server yourself.
 
 ### 1. Get a credentials file
 
